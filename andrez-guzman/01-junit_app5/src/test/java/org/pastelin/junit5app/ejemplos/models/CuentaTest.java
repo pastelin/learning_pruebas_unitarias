@@ -97,8 +97,6 @@ class CuentaTest {
             //assertNotEquals(cuenta2, cuenta);
             assertEquals(cuenta2, cuenta);
         }
-
-
     }
 
     @Nested
@@ -176,8 +174,6 @@ class CuentaTest {
                             .getPersona()),
                     () -> assertTrue(banco.getCuentas().stream()
                             .anyMatch(c -> c.getPersona().equals("Juan"))));
-
-
         }
     }
 
