@@ -22,6 +22,7 @@ public class CuentaServiceImpl implements CuentaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Cuenta> findAll() {
         return cuentaRepository.findAll();
     }
@@ -33,8 +34,15 @@ public class CuentaServiceImpl implements CuentaService {
     }
 
     @Override
+    @Transactional
     public Cuenta save(Cuenta cuenta) {
         return cuentaRepository.save(cuenta);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        cuentaRepository.deleteById(id);
     }
 
     @Override

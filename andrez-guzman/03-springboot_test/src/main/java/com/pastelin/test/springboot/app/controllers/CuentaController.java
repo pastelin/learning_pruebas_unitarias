@@ -27,9 +27,15 @@ public class CuentaController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Cuenta detalle(@PathVariable(name = "id") Long id) {
-        return cuentaService.findById(id);
+    public ResponseEntity<?> detalle(@PathVariable(name = "id") Long id) {
+
+        Cuenta cuenta = null;
+        try {
+            cuenta = cuentaService.findById(id);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(cuenta);
     }
 
     @PostMapping
@@ -51,5 +57,10 @@ public class CuentaController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable(name = "id") Long id) {
+        cuentaService.deleteById(id);
+    }
 
 }
