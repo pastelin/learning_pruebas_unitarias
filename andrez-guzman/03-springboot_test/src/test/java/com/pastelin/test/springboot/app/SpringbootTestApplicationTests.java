@@ -16,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -67,10 +69,10 @@ class SpringbootTestApplicationTests {
 
         verify(cuentaRepository, times(3)).findById(1L);
         verify(cuentaRepository, times(3)).findById(2L);
-        verify(cuentaRepository, times(2)).update(any(Cuenta.class));
+        verify(cuentaRepository, times(2)).save(any(Cuenta.class));
 
         verify(bancoRepository, times(2)).findById(1L);
-        verify(bancoRepository).update(any(Banco.class));
+        verify(bancoRepository).save(any(Banco.class));
 
         verify(cuentaRepository, times(6)).findById(anyLong());
         verify(cuentaRepository, never()).findAll();
@@ -102,10 +104,10 @@ class SpringbootTestApplicationTests {
 
         verify(cuentaRepository, times(3)).findById(1L);
         verify(cuentaRepository, times(2)).findById(2L);
-        verify(cuentaRepository, never()).update(any(Cuenta.class));
+        verify(cuentaRepository, never()).save(any(Cuenta.class));
 
         verify(bancoRepository, times(1)).findById(1L);
-        verify(bancoRepository, never()).update(any(Banco.class));
+        verify(bancoRepository, never()).save(any(Banco.class));
 
         verify(cuentaRepository, times(5)).findById(anyLong());
         verify(cuentaRepository, never()).findAll();
@@ -124,6 +126,40 @@ class SpringbootTestApplicationTests {
         assertEquals("Andres", cuenta2.getPersona());
 
         verify(cuentaRepository, times(2)).findById(1L);
+    }
+
+    @Test
+    void testFindAll() {
+
+        List<Cuenta> datos = Arrays.asList(Datos.crearCuenta0001().orElseThrow(), Datos.crearCuenta0002().orElseThrow());
+        when(cuentaRepository.findAll()).thenReturn(datos);
+
+        List<Cuenta> cuentas = service.findAll();
+
+        assertFalse(cuentas.isEmpty());
+        assertEquals(2, cuentas.size());
+        assertEquals("Andres", cuentas.get(0).getPersona());
+        assertEquals("Jhon", cuentas.get(1).getPersona());
+
+        verify(cuentaRepository).findAll();
+    }
+
+    @Test
+    void testSave() {
+        Cuenta cuenta = new Cuenta(null, "Pepe", new BigDecimal("3000"));
+        when(cuentaRepository.save(any())).then(invocation -> {
+            Cuenta c = invocation.getArgument(0);
+            c.setId(3L);
+            return c;
+        });
+
+        Cuenta cuentaCreada = service.save(cuenta);
+
+        assertEquals("Pepe", cuentaCreada.getPersona());
+        assertEquals(3L, cuentaCreada.getId());
+        assertEquals("3000", cuentaCreada.getSaldo().toPlainString());
+
+        verify(cuentaRepository).save(any());
     }
 
 }
